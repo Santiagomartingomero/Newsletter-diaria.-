@@ -5,8 +5,8 @@
 1. Ve a tu repositorio en GitHub
 2. Haz clic en **Settings** → **Secrets and variables** → **Actions**
 3. Pulsa **New repository secret**
-4. Nombre: `PERPLEXITY_API_KEY`
-5. Valor: tu API key de Perplexity (empieza por `pplx-...`)
+4. Nombre exacto: `GEMINI_API_KEY`
+5. Valor: tu API key de Google AI Studio
 6. Guarda
 
 ¡Listo! El agente se ejecutará automáticamente **de lunes a viernes a las 7:00 WEST**.
@@ -25,10 +25,9 @@ directamente desde GitHub.
 
 ## Modelo utilizado
 
-- **Perplexity `sonar`**: modelo con búsqueda web en tiempo real,
-  ideal para noticias de las últimas 24-48 horas.
-- Coste estimado: ~$0.02-0.05 por edición diaria.
+- **Google Gemini 2.0 Flash**: modelo gratuito con Google Search Grounding en tiempo real.
+- Coste: **€0,00** en el tier gratuito (hasta 1.500 req/día).
 
-## Obtener tu API Key de Perplexity
+## Obtener tu API Key de Google AI Studio
 
-https://www.perplexity.ai/settings/api
+https://aistudio.google.com/apikey

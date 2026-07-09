@@ -1,17 +1,16 @@
 import os
 import requests
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 # ─── Config ───────────────────────────────────────────────────────────────────
-API_KEY = os.environ["PERPLEXITY_API_KEY"]
-API_URL = "https://api.perplexity.ai/chat/completions"
-MODEL   = "sonar"   # modelo con búsqueda web en tiempo real
+API_KEY = os.environ["GEMINI_API_KEY"]
+MODEL   = "gemini-2.0-flash"   # gratuito, rápido y con Google Search Grounding
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
 
-fecha_hoy = datetime.now().strftime("%d de %B de %Y")
+fecha_hoy     = datetime.now().strftime("%d de %B de %Y")
 fecha_archivo = datetime.now().strftime("%Y-%m-%d")
 
-# ─── Prompt del agente ────────────────────────────────────────────────────────
+# ─── Prompt ───────────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un agente periodístico personal llamado \"El Diario de Santiago\".
 Tu misión es generar cada mañana un periódico digital de consulta diaria,
 personalizado, riguroso y accionable, para un cardiólogo electrofisiólogo
@@ -32,9 +31,10 @@ REGLAS GENERALES:
 - Formato: Markdown limpio y optimizado para lectura en pantalla
 - No rellenes con noticias irrelevantes; si una sección está vacía, dilo"""
 
-USER_PROMPT = f"""Genera la edición completa de hoy, {fecha_hoy}, de El Diario de Santiago.
+USER_PROMPT = f"""Usa Google Search para buscar noticias REALES de hoy {fecha_hoy} y genera
+la edición completa de El Diario de Santiago.
 
-Sigue EXACTAMENTE esta estructura:
+Sigue EXACTAMENTE esta estructura en Markdown:
 
 # 📰 El Diario de Santiago — {fecha_hoy}
 
@@ -107,27 +107,33 @@ Máximo 4 líneas.
 *Generado automáticamente por El Diario de Santiago · {fecha_hoy} · Las Palmas de Gran Canaria*
 """
 
-# ─── Llamada a la API ─────────────────────────────────────────────────────────
-headers = {
-    "Authorization": f"Bearer {API_KEY}",
-    "Content-Type": "application/json"
-}
-
+# ─── Llamada a Gemini API con Google Search Grounding ───────────────────────────
 payload = {
-    "model": MODEL,
-    "messages": [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user",   "content": USER_PROMPT}
-    ],
-    "max_tokens": 4000,
-    "temperature": 0.2,
-    "search_recency_filter": "day"
+    "system_instruction": {
+        "parts": [{"text": SYSTEM_PROMPT}]
+    },
+    "contents": [{
+        "role": "user",
+        "parts": [{"text": USER_PROMPT}]
+    }],
+    "tools": [{
+        "google_search": {}   # activa búsqueda web en tiempo real
+    }],
+    "generationConfig": {
+        "temperature": 0.2,
+        "maxOutputTokens": 4096
+    }
 }
 
-response = requests.post(API_URL, headers=headers, json=payload)
+response = requests.post(
+    API_URL,
+    headers={"Content-Type": "application/json"},
+    json=payload
+)
 response.raise_for_status()
 
-contenido = response.json()["choices"][0]["message"]["content"]
+data = response.json()
+contenido = data["candidates"][0]["content"]["parts"][0]["text"]
 
 # ─── Guardar edición ──────────────────────────────────────────────────────────
 os.makedirs("ediciones", exist_ok=True)
