@@ -1,0 +1,38 @@
+name: 📰 Generar Newsletter Diaria
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'  # Lunes a viernes a las 7:00 WEST (06:00 UTC)
+  workflow_dispatch:        # También ejecutable manualmente desde GitHub
+
+jobs:
+  generar-newsletter:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Instalar dependencias
+        run: pip install requests python-dateutil
+
+      - name: 🤖 Generar newsletter con Perplexity API
+        env:
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+        run: python scripts/generar_newsletter.py
+
+      - name: 💾 Commit y push de la edición del día
+        run: |
+          git config user.name "El Diario de Santiago Bot"
+          git config user.email "actions@github.com"
+          git add ediciones/
+          git diff --staged --quiet || git commit -m "📰 Edición $(date +'%Y-%m-%d')"
+          git push
