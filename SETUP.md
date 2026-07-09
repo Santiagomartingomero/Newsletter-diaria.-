@@ -1,33 +1,32 @@
 # ⚙️ Configuración del Agente Automático
 
-## Paso único: añadir tu API Key como GitHub Secret
+## APIs necesarias (ambas gratuitas, sin tarjeta)
 
-1. Ve a tu repositorio en GitHub
-2. Haz clic en **Settings** → **Secrets and variables** → **Actions**
-3. Pulsa **New repository secret**
-4. Nombre exacto: `GEMINI_API_KEY`
-5. Valor: tu API key de Google AI Studio
-6. Guarda
+| API | Para qué | Dónde crearla | Nombre del secret |
+|-----|----------|---------------|-------------------|
+| Groq | Generar el texto (LLaMA 3.3 70B) | [console.groq.com/keys](https://console.groq.com/keys) | `GROQ_API_KEY` |
+| Tavily | Buscar noticias en tiempo real | [app.tavily.com](https://app.tavily.com) | `TAVILY_API_KEY` |
 
-¡Listo! El agente se ejecutará automáticamente **de lunes a viernes a las 7:00 WEST**.
+## Añadir los secrets a GitHub
+
+1. Ve a **Settings → Secrets and variables → Actions**
+2. Crea dos secrets:
+   - Nombre: `GROQ_API_KEY` → tu key de Groq (empieza por `gsk_...`)
+   - Nombre: `TAVILY_API_KEY` → tu key de Tavily (empieza por `tvly-...`)
+
+## Ejecución automática
+
+El agente se ejecuta **de lunes a viernes a las 7:00 WEST** automáticamente.
 
 ## Ejecución manual
 
-Si quieres generar la newsletter fuera del horario automático:
-1. Ve a **Actions** en tu repo
-2. Selecciona **📰 Generar Newsletter Diaria**
-3. Pulsa **Run workflow**
+1. Ve a **Actions** → **📰 Generar Newsletter Diaria**
+2. Pulsa **Run workflow**
 
-## Dónde encontrar cada edición
+## Dónde leer cada edición
 
-Cada edición se guarda en `ediciones/YYYY-MM-DD.md` y es accesible
-directamente desde GitHub.
+Cada edición se guarda en `ediciones/YYYY-MM-DD.md`.
 
-## Modelo utilizado
+## Coste
 
-- **Google Gemini 2.0 Flash**: modelo gratuito con Google Search Grounding en tiempo real.
-- Coste: **€0,00** en el tier gratuito (hasta 1.500 req/día).
-
-## Obtener tu API Key de Google AI Studio
-
-https://aistudio.google.com/apikey
+**€0,00** — ambas APIs tienen tier gratuito más que suficiente para 1 newsletter diaria.
